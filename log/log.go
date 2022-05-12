@@ -87,11 +87,11 @@ type ZapTeeConfig struct {
 	UseJsonEncoder   bool
 }
 
-func RecommendLogger() *zap.Logger {
-	return RecommendLoggerWithLogPath("/data/logs")
+func RecommendLogger(opts ...zap.Option) *zap.Logger {
+	return RecommendLoggerWithLogPath("/data/logs", opts...)
 }
 
-func RecommendLoggerWithLogPath(logPath string) *zap.Logger {
+func RecommendLoggerWithLogPath(logPath string, opts ...zap.Option) *zap.Logger {
 	teeConfigs := []ZapTeeConfig{
 		{
 			LevelEnablerFunc: func(level zapcore.Level) bool {
@@ -118,8 +118,9 @@ func RecommendLoggerWithLogPath(logPath string) *zap.Logger {
 			UseJsonEncoder: false,
 		},
 	}
-	return MultiCoreLogger(teeConfigs, false,
-		zap.AddCaller(), zap.AddCallerSkip(0), zap.AddStacktrace(zap.WarnLevel))
+	optArr := []zap.Option{zap.AddCaller(), zap.AddCallerSkip(0), zap.AddStacktrace(zap.WarnLevel)}
+	optArr = append(optArr, opts...)
+	return MultiCoreLogger(teeConfigs, false, optArr...)
 }
 
 func MultiCoreLogger(teeConfigs []ZapTeeConfig, removeDevLogger bool, opts ...zap.Option) *zap.Logger {
