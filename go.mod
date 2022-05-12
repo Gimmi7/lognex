@@ -1,4 +1,4 @@
-module lognex
+module github.com/Gimmi7/lognex
 
 go 1.18
 

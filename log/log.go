@@ -8,11 +8,16 @@ import (
 	"os"
 )
 
-var zapLogger *zap.Logger
+var zapLogger, _ = zap.NewDevelopment()
 
 // GetZapLogger get cached zap logger, cache was created when call logger generation func in `*/lognex/log` package
 func GetZapLogger() *zap.Logger {
 	return zapLogger
+}
+
+// SetZapLogger explicitly set zapLogger only when logger generation func in `*/lognex/log` can`t match your requirements
+func SetZapLogger(logger *zap.Logger) {
+	zapLogger = logger
 }
 
 // Sugar wraps the Logger to provide a more ergonomic, but slightly slower,
