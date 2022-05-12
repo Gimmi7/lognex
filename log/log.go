@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-var zapLogger, _ = zap.NewDevelopment()
+var zapLogger, _ = zap.NewDevelopment(zap.AddCallerSkip(1))
 
 // GetZapLogger get cached zap logger, cache was created when call logger generation func in `*/lognex/log` package
 func GetZapLogger() *zap.Logger {
@@ -25,7 +25,9 @@ func SetZapLogger(logger *zap.Logger) {
 // single application to use both Loggers and SugaredLoggers, converting
 // between them on the boundaries of performance-sensitive code.
 func Sugar() *zap.SugaredLogger {
-	return zapLogger.Sugar()
+	// we AddCallerSkip(1) in
+	base := zapLogger.WithOptions(zap.AddCallerSkip(-1))
+	return base.Sugar()
 }
 
 // Debug logs a message at DebugLevel. The message includes any fields passed
@@ -118,7 +120,7 @@ func RecommendLoggerWithLogPath(logPath string, opts ...zap.Option) *zap.Logger 
 			UseJsonEncoder: false,
 		},
 	}
-	optArr := []zap.Option{zap.AddCaller(), zap.AddCallerSkip(0), zap.AddStacktrace(zap.WarnLevel)}
+	optArr := []zap.Option{zap.AddCaller(), zap.AddCallerSkip(1), zap.AddStacktrace(zap.WarnLevel)}
 	optArr = append(optArr, opts...)
 	return MultiCoreLogger(teeConfigs, false, optArr...)
 }
